@@ -5,7 +5,7 @@ module.exports = {
      * @type String
      * @required
      */
-    "name": "Crits",
+    "name": "CRITs",
     /**
      * The acronym that appears in the notification window when information from this integration
      * is displayed.  Note that the acronym is included as part of each "tag" in the summary information
@@ -22,7 +22,7 @@ module.exports = {
      * @type String
      * @optional
      */
-    "description": "This is a sample generic REST integration",
+    "description": "Integration for CRITs, an open source malware and threat repository",
     /**
      * An array of style files (css or less) that will be included for your integration. Any styles specified in
      * the below files can be used in your custom template.
@@ -58,12 +58,21 @@ module.exports = {
      */
     "options":[
         {
+            "key": "hostname",
+            "name": "CRITs Hostname",
+            "description": "The URL for your CRITs server",
+            "default":"",
+            "type": "text",
+            "user-can-edit": false,
+            "admin-only": true
+        },
+        {
             /**
              * A Unique name for the option.  Should be camelcased (lowercase first letter, uppercase letters for
              * subsequent words).
              *
              * @property key
-             * @type String             *
+             * @type String
              */
             "key"         : "apiKey",
             /**
@@ -79,7 +88,7 @@ module.exports = {
              * @property description
              * @type String
              */
-            "description" : "Your API key for authenticating to Crits",
+            "description" : "Your API key for authenticating to CRITs",
             /**
              * The default value for the option.  Note this value can be either a String or Boolean depending on
              * the @type specified by the `type` property.
@@ -114,20 +123,29 @@ module.exports = {
             "admin-only"    : false
         },
         {
-            "key": "host",
-            "name": "Crits Hostname",
-            "descripition": "The URL for your Crits server",
+            "key": "username",
+            "name": "Username",
+            "description": "Your CRITs username",
             "default":"",
             "type": "text",
             "user-can-edit": false,
             "admin-only": true
         },
         {
-            "key": "username",
-            "name": "Username",
-            "descripition": "Your crits username",
-            "default":"",
-            "type": "text",
+            "key": "lookupIps",
+            "name": "Lookup IP Address Resources",
+            "description": "If checked, the integration will lookup IP addresses",
+            "default":true,
+            "type": "boolean",
+            "user-can-edit": false,
+            "admin-only": true
+        },
+        {
+            "key": "lookupHashes",
+            "name": "Lookup Hashes",
+            "description": "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
+            "default":true,
+            "type": "boolean",
             "user-can-edit": false,
             "admin-only": true
         }
