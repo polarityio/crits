@@ -4,20 +4,95 @@ the "Detail Block" within the notification window which is the data you see when
 In this template we are iterating over all the key-value pairs in `block.data.details` which maps directly back to
 object we returned from our doLookup method inside `integration.js`
 --}}
-<table style="width: 100%">
-    <thead>
-    <tr>
-        <th>Property</th>
-        <th>Value</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{#each-in block.data.details as |key value|}}
-        <tr>
-            <td>{{{key}}}</td>
-            <td>{{{value}}}</td>
-        </tr>
-    {{/each-in}}
-    </tbody>
-</table>
+<div class="crits-link section">
+    <a href="{{block.data.details.critsLookupUrl}}">View in CRITs</a> <i class="btb bt-external-link"></i>
+</div>
+<div class="description section">
+    {{#unless editDescriptionMode}}
+        {{#if block.data.details.description}}
+            {{block.data.details.description}}
+        {{else}}
+            <span class="no-data">No Description provided</span>
+        {{/if}}
+    {{!--
+        <i {{action "editDescription"}} class="btn btn-default btn-xs btb bt-edit description-edit-btn pull-right"></i>
+        --}}
+    {{/unless}}
+    {{!--
+    {{#if editDescriptionMode}}
+        {{textarea value=block.data.details.description}}
+    <div class="button-container">
+        {{editDescriptionErrorMessage}}
+        <button {{action "saveDescriptionEdit"}} class="btn material btn-default btn-xs">
+            <i class=" btb bt-check description-edit-btn pull-right"></i>
+            save
+        </button>
+        <button {{action "cancelDescriptionEdit"}} class="btn material btn-default btn-xs">
+            <i class="btb bt-times description-edit-btn pull-right"></i>
+            cancel
+        </button>
+    </div>
+    {{/if}}
+    --}}
+</div>
+<div class="buckets section">
+    {{#if (gt block.data.details.bucketList.length 0)}}
+        {{#each block.data.details.bucketList as |bucket|}}
+            <span class="bucket">
+                {{bucket}}
+            </span>
+        {{/each}}
+    {{else}}
+        <span class="no-data">No Tags Specified</span>
+    {{/if}}
+</div>
+<div class="source section">
+    <h2><i class="bts bt-fw bt-map-marker integration-text-bold-color"></i> Sources</h2>
+    {{#if (gt block.data.details.source.length 0)}}
+        <ul>
+            {{#each block.data.details.source as |source|}}
+                <li>{{source.name}}</li>
+            {{/each}}
+        </ul>
+    {{else}}
+        <span class="no-data">No Sources Specified</span>
+    {{/if}}
+</div>
 
+<div class="campaign section">
+    <h2><i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i> Campaigns</h2>
+    <table>
+        <thead>
+        <th>Name</th>
+        <th>Analyst</th>
+        <th>Confidence</th>
+        <th>Date</th>
+        </thead>
+        <tbody>
+        {{#each block.data.details.campaign as |campaign|}}
+            <tr>
+                <td>{{campaign.name}}</td>
+                <td>{{campaign.analyst}}</td>
+                <td>{{campaign.confidence}}</td>
+                <td>{{moment-time campaign.date}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</div>
+
+
+<div class="threat-types section">
+    <h2><i class="fa fa-fw fa-bug integration-text-bold-color"></i> Threat Types</h2>
+    {{#if (gt block.data.details.threatTypes.length 0)}}
+        {{#each block.data.details.threatTypes as |threat|}}
+            {{threat}}
+        {{/each}}
+    {{else}}
+        <span class="no-data">No Threat Types Specified</span>
+    {{/if}}
+</div>
+
+<div class="last-modified last-section">
+    Last Modified: {{block.data.details.modified}}
+</div>
