@@ -60,7 +60,7 @@ module.exports = {
         {
             "key": "hostname",
             "name": "CRITs Hostname",
-            "description": "The URL for your CRITs server",
+            "description": 'The hostname for your CRITs server including "http://" or "https://" as required.',
             "default":"",
             "type": "text",
             "user-can-edit": false,
@@ -128,8 +128,8 @@ module.exports = {
             "description": "Your CRITs username",
             "default":"",
             "type": "text",
-            "user-can-edit": false,
-            "admin-only": true
+            "user-can-edit": true,
+            "admin-only": false
         },
         {
             "key": "lookupIps",
@@ -137,8 +137,8 @@ module.exports = {
             "description": "If checked, the integration will lookup IP addresses",
             "default":true,
             "type": "boolean",
-            "user-can-edit": false,
-            "admin-only": true
+            "user-can-edit": true,
+            "admin-only": false
         },
         {
             "key": "lookupHashes",
@@ -146,8 +146,8 @@ module.exports = {
             "description": "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
             "default":true,
             "type": "boolean",
-            "user-can-edit": false,
-            "admin-only": true
+            "user-can-edit": true,
+            "admin-only": false
         }
     ]
 };

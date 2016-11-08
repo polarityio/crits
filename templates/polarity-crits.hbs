@@ -7,13 +7,33 @@ object we returned from our doLookup method inside `integration.js`
 <div class="crits-link section">
     <a href="{{block.data.details.critsLookupUrl}}">View in CRITs</a> <i class="btb bt-external-link"></i>
 </div>
-
 <div class="description section">
-    {{#if block.data.details.description}}
-        {{block.data.details.description}}
-    {{else}}
-        <span class="no-data">No Description provided</span>
+    {{#unless editDescriptionMode}}
+        {{#if block.data.details.description}}
+            {{block.data.details.description}}
+        {{else}}
+            <span class="no-data">No Description provided</span>
+        {{/if}}
+    {{!--
+        <i {{action "editDescription"}} class="btn btn-default btn-xs btb bt-edit description-edit-btn pull-right"></i>
+        --}}
+    {{/unless}}
+    {{!--
+    {{#if editDescriptionMode}}
+        {{textarea value=block.data.details.description}}
+    <div class="button-container">
+        {{editDescriptionErrorMessage}}
+        <button {{action "saveDescriptionEdit"}} class="btn material btn-default btn-xs">
+            <i class=" btb bt-check description-edit-btn pull-right"></i>
+            save
+        </button>
+        <button {{action "cancelDescriptionEdit"}} class="btn material btn-default btn-xs">
+            <i class="btb bt-times description-edit-btn pull-right"></i>
+            cancel
+        </button>
+    </div>
     {{/if}}
+    --}}
 </div>
 <div class="buckets section">
     {{#if (gt block.data.details.bucketList.length 0)}}
@@ -23,30 +43,30 @@ object we returned from our doLookup method inside `integration.js`
             </span>
         {{/each}}
     {{else}}
-        <span class="no-data">No Buckets Specified</span>
+        <span class="no-data">No Tags Specified</span>
     {{/if}}
 </div>
 <div class="source section">
     <h2><i class="bts bt-fw bt-map-marker integration-text-bold-color"></i> Sources</h2>
-{{#if (gt block.data.details.source.length 0)}}
-    <ul>
-    {{#each block.data.details.source as |source|}}
-        <li>{{source.name}}</li>
-    {{/each}}
-    </ul>
-{{else}}
-    <span class="no-data">No Sources Specified</span>
-{{/if}}
+    {{#if (gt block.data.details.source.length 0)}}
+        <ul>
+            {{#each block.data.details.source as |source|}}
+                <li>{{source.name}}</li>
+            {{/each}}
+        </ul>
+    {{else}}
+        <span class="no-data">No Sources Specified</span>
+    {{/if}}
 </div>
 
 <div class="campaign section">
     <h2><i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i> Campaigns</h2>
     <table>
         <thead>
-            <th>Name</th>
-            <th>By</th>
-            <th>Confidence</th>
-            <th>Date</th>
+        <th>Name</th>
+        <th>Analyst</th>
+        <th>Confidence</th>
+        <th>Date</th>
         </thead>
         <tbody>
         {{#each block.data.details.campaign as |campaign|}}
@@ -62,17 +82,15 @@ object we returned from our doLookup method inside `integration.js`
 </div>
 
 
-
-
 <div class="threat-types section">
     <h2><i class="fa fa-fw fa-bug integration-text-bold-color"></i> Threat Types</h2>
-{{#if (gt block.data.details.threatTypes.length 0)}}
-    {{#each block.data.details.threatTypes as |threat|}}
-        {{threat}}
-    {{/each}}
-{{else}}
-    <span class="no-data">No Threat Types Specified</span>
-{{/if}}
+    {{#if (gt block.data.details.threatTypes.length 0)}}
+        {{#each block.data.details.threatTypes as |threat|}}
+            {{threat}}
+        {{/each}}
+    {{else}}
+        <span class="no-data">No Threat Types Specified</span>
+    {{/if}}
 </div>
 
 <div class="last-modified last-section">

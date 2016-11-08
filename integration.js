@@ -1,4 +1,5 @@
 'use strict';
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var request = require('request');
 var _ = require('lodash');
@@ -69,7 +70,7 @@ function doLookup(entities, options, cb) {
     let lookupResults = [];
 
     async.each(entities, function (entityObj, next) {
-        if (entityObj.isIP) {
+        if (entityObj.isIP && options.lookupIps) {
             _lookupIP(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
@@ -80,7 +81,7 @@ function doLookup(entities, options, cb) {
                     next(null);
                 }
             });
-        } else if(entityObj.isMD5 || entityObj.isSHA1 || entityObj.isSHA256){
+        } else if((entityObj.isMD5 || entityObj.isSHA1 || entityObj.isSHA256) && options.lookupHashes){
             _lookupHash(entityObj, options, function(err, results){
                 if(err){
                     next(err);
@@ -108,6 +109,10 @@ function doLookup(entities, options, cb) {
          */
         cb(err, entitiesWithNoData, lookupResults);
     });
+}
+
+function _getPatchDescriptionUri(type, objectId, options){
+    return _getFormattedHostname(options) + '/api/v1/' + type + '/' + objectId + _getUriAuthQueryParam(options);
 }
 
 function _getIpUri(value, options) {
@@ -150,7 +155,8 @@ function _lookupHash(entityObj, options, cb){
     request({
         uri: _getHashUri(entityObj.hashType, entityObj.value, options),
         method: 'GET',
-        json: true
+        json: true,
+        rejectUnauthorized: false
     }, function(err, response, body){
         let error = _getErrorMessage(err, response, body);
         if(error !== null){
@@ -183,7 +189,8 @@ function _lookupHash(entityObj, options, cb){
                         description: object.description,
                         modified: object.modified,
                         source: object.source,
-                        threatTypes: object.threat_types
+                        threatTypes: object.threat_types,
+                        patchDescriptionUri: _getPatchDescriptionUri('indicator', object._id, options)
                     }
                 }
             })
@@ -193,8 +200,12 @@ function _lookupHash(entityObj, options, cb){
 }
 
 function _getErrorMessage(err, response, body){
-    if (err) {
-        return 'Could not access CRITs server';
+    if (err && typeof err.code === 'string') {
+        return err.code;
+    }
+
+    if(err && typeof err === 'object'){
+        return JSON.stringify(err);
     }
 
     if(response.statusCode == 401){
@@ -212,7 +223,8 @@ function _lookupIP(entityObj, options, cb) {
     request({
         uri: _getIpUri(entityObj.value, options),
         method: 'GET',
-        json: true
+        json: true,
+        rejectUnauthorized: false
     }, function (err, response, body) {
         // check for an error
         let error = _getErrorMessage(err, response, body);
@@ -226,7 +238,8 @@ function _lookupIP(entityObj, options, cb) {
 
         for (let i = 0; i < critObjects.length; i++) {
             let object = critObjects[i];
-            object._critsLookupUrl = _getCritsIpUrl(options, object);
+            let critsLookupUrl = _getCritsIpUrl(options, object);
+
             results.push({
                 entity: entityObj,
                 // Required: An object containing everything you want passed to the template
@@ -236,7 +249,16 @@ function _lookupIP(entityObj, options, cb) {
                     // Required: These are the tags that are displayed in your template
                     tags: _createTags(object),
                     // Data that you want to pass back to the notification window details block
-                    details: object
+                    details: {
+                        critsLookupUrl: critsLookupUrl,
+                        bucketList: object.bucket_list,
+                        campaign: object.campaign,
+                        description: object.description,
+                        modified: object.modified,
+                        source: object.source,
+                        threatTypes: object.threat_types,
+                        patchDescriptionUri: _getPatchDescriptionUri('ips', object._id, options)
+                    }
                 }
             })
         }

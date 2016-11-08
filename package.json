@@ -1,7 +1,7 @@
 {
   "main": "./integration.js",
   "name": "polarity-crits",
-  "description": "Integration with Crits",
+  "description": "Integration with CRITs",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
