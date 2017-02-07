@@ -49,6 +49,7 @@ module.exports = {
             "file": "./templates/polarity-crits.hbs"
         }
     },
+    "logging": { level: 'trace'},
     /**
      * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
      * as an array of option objects.
@@ -63,13 +64,13 @@ module.exports = {
             "description": 'The hostname for your CRITs server including "http://" or "https://" as required.',
             "default":"",
             "type": "text",
-            "user-can-edit": false,
-            "admin-only": true
+            "userCanEdit": false,
+            "adminOnly": true
         },
         {
             /**
              * A Unique name for the option.  Should be camelcased (lowercase first letter, uppercase letters for
-             * subsequent words).
+             * subsequent words).  Should not contains dashes, hyphens or spaces.
              *
              * @property key
              * @type String
@@ -112,7 +113,7 @@ module.exports = {
              * @property user-can-edit
              * @type Boolean
              */
-            "user-can-edit" : true,
+            "userCanEdit" : true,
             /**
              * If set to true, the setting can only be viewed by admins.  For all other users the setting will not appear.
              * Note that if `admin-only` is set to true the value of `user-can-edit` is not applicable.
@@ -120,7 +121,7 @@ module.exports = {
              * @property admin-only
              * @type Boolean
              */
-            "admin-only"    : false
+            "adminOnly"    : false
         },
         {
             "key": "username",
@@ -128,8 +129,8 @@ module.exports = {
             "description": "Your CRITs username",
             "default":"",
             "type": "text",
-            "user-can-edit": true,
-            "admin-only": false
+            "userCanEdit": true,
+            "adminOnly": false
         },
         {
             "key": "lookupIps",
@@ -137,8 +138,8 @@ module.exports = {
             "description": "If checked, the integration will lookup IP addresses",
             "default":true,
             "type": "boolean",
-            "user-can-edit": true,
-            "admin-only": false
+            "userCanEdit": true,
+            "adminOnly": false
         },
         {
             "key": "lookupHashes",
@@ -146,8 +147,17 @@ module.exports = {
             "description": "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
             "default":true,
             "type": "boolean",
-            "user-can-edit": true,
-            "admin-only": false
+            "userCanEdit": true,
+            "adminOnly": false
+        },
+        {
+            "key": "lookupDomains",
+            "name": "Lookup Domains",
+            "description": "If checked, the integration will lookup domains",
+            "default":true,
+            "type": "boolean",
+            "userCanEdit": true,
+            "adminOnly": false
         }
     ]
 };
