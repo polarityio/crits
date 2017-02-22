@@ -120,7 +120,7 @@ function doLookup(entities, options, cb) {
          *      the error.  This is a good place to return errors related to API authentication or other issues.     *
          * @parameter lookupResults An array of lookup result objects
          */
-        Logger.info({lookupResults: lookupResults}, 'Lookup Results');
+        Logger.debug({lookupResults: lookupResults}, 'Lookup Results');
         cb(err, lookupResults);
     });
 }
