@@ -49,7 +49,7 @@ module.exports = {
             "file": "./templates/polarity-crits.hbs"
         }
     },
-    "logging": { level: 'trace'},
+    "logging": { level: 'info'},
     /**
      * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
      * as an array of option objects.
