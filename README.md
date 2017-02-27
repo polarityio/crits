@@ -26,7 +26,7 @@ Hashes of type MD5, SHA1, and SHA256 are currently searched as both indicators a
 
 You can install an integration by downloading the file from github, or by using git to clone the repo into your instance.
 
-#### Install from Zip/Tar File
+### Install from Zip/Tar File
 
 1. Click on the `Releases` link
 2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration)
@@ -74,7 +74,7 @@ service polarityd restart
 
 9. Navigate to the integrations page in Polarity-Web to configure the integration.
 
-#### Installing via GIT Clone
+### Installing via GIT Clone
 
 1. Navigate to the integrations folder:
 
