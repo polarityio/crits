@@ -28,10 +28,10 @@ You can install an integration by downloading the file from github, or by using 
 
 ### Install from Zip/Tar File
 
-1. Click on the `Releases` link
-2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration)
-3. Upload the `tar.gz` file to your Polarity Server
-4. Move the `tar.gz` file to the Polarity Server integrations directory
+1. Click on the `Releases` link near the top of the polarityio/CRITs GitHub page.
+2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration).
+3. Upload the `tar.gz` file to your Polarity Server.
+4. Move the `tar.gz` file to the Polarity Server integrations directory.
 
  ```bash
  mv <filename> /app/polarity-server/integrations
@@ -43,19 +43,19 @@ You can install an integration by downloading the file from github, or by using 
  cd /app/polarity-server/integrations
  ```
   
-6. Extract the zip by running the following command
+6. Extract the tar file:
 
  ```bash
  tar -xzvf <filename>
  ```
 
-6. Navigate into the extracted folder for the new integration.
+6. Navigate into the extracted folder for the new integration:
 
  ```bash
 cd <filename>
 ```
 
-7. Run the following command to install the integration's dependencies:
+7. Install the integration's dependencies:
 
  ```bash
 npm install
@@ -73,7 +73,7 @@ chown -R polarityd:polarityd /app/polarity-server/integrations/CRITs
 service polarityd restart
 ```
 
-9. Navigate to the integrations page in Polarity-Web to configure the integration.
+10. Navigate to the integrations page in Polarity-Web to configure the integration.
 
 ### Installing via GIT Clone
 
@@ -83,7 +83,7 @@ service polarityd restart
 cd /app/polarity-server/integrations
 ```
 
-2. Run the following git command:
+2. Clone a specific version of the CRITs repo using git:
 
  ```bash
 git clone --branch <version> https://github.com/polarityio/CRITs.git
