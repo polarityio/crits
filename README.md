@@ -1,12 +1,15 @@
 # Polarity CRITs Integration 
 
-> CRITs is an open source malware and threat repository that leverages other open source software to create a unified tool for analysts and security experts engaged in threat defense. It has been in development since 2010 with one goal in mind: give the security community a flexible and open platform for analyzing and collaborating on threat data.
-
-For more information about CRITs please see:
-
-https://crits.github.io
-
 The Polarity CRITs integration allows Polarity to search your CRITs deployment for IPs, Hashes, and Domains in real-time.
+
+
+CRITs is an open source malware and threat repository that leverages other open source software to create a unified tool for analysts and security experts engaged in threat defense. It has been in development since 2010 with one goal in mind: give the security community a flexible and open platform for analyzing and collaborating on threat data. For more information about CRITs please see [https://crits.github.io]().
+
+
+| ![image](https://cloud.githubusercontent.com/assets/306319/24310755/86b712d2-10a7-11e7-8469-9c69184f450b.png)
+ |
+|---|
+|*CRITs Lookup of MD5 Hash* |
 
 ## Supported Types
 
@@ -28,7 +31,7 @@ You can install an integration by downloading the file from github, or by using 
 
 ### Install from Zip/Tar File
 
-1. Click on the `Releases` link near the top of the polarityio/CRITs GitHub page.
+1. Navigate to the [polarityio/crits releases page](https://github.com/polarityio/crits/releases).
 2. Download the `tar.gz` file for the version of the integration you want to install (we typically recommend installing the latest version of the integration).
 3. Upload the `tar.gz` file to your Polarity Server.
 4. Move the `tar.gz` file to the Polarity Server integrations directory.
@@ -64,7 +67,7 @@ npm install
 8. Ensure the integration directory is owned by the `polarityd` user
  
  ```bash
-chown -R polarityd:polarityd /app/polarity-server/integrations/CRITs
+chown -R polarityd:polarityd /app/polarity-server/integrations/crits
 ```
 
 9. Restart your Polarity-Server
@@ -86,7 +89,7 @@ cd /app/polarity-server/integrations
 2. Clone a specific version of the CRITs repo using git:
 
  ```bash
-git clone --branch <version> https://github.com/polarityio/CRITs.git
+git clone --branch <version> https://github.com/polarityio/crits.git
 ```
 
 3. Change into the integration directory
@@ -104,7 +107,7 @@ npm install
 5.  Ensure the integration directory is owned by the `polarityd` user
 
  ```bash
-chown -R polarityd:polarityd /app/polarity-server/integrations/CRITs
+chown -R polarityd:polarityd /app/polarity-server/integrations/crits
 ```
 
 6. Restart your Polarity-Server
