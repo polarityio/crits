@@ -22,7 +22,7 @@ dependency-reduced-pom.xml
 # Ignore local log files
 *.log
 
-# Ignore Generate HTML README Files
+# Ignore Generated HTML README Files
 README.html
 
 # Ignored installed NPM modules
