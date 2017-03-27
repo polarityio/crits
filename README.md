@@ -25,6 +25,32 @@ The Polarity CRITs integration currently searches for IPv4 and IPv6 (including R
 
 Hashes of type MD5, SHA1, and SHA256 are currently searched as both indicators and samples.   When being searched as an indicator the URL queried is `/v1/api/indicators?c-type=<hashType>&c-lower=<hashValue>`.  When hashes are searched as samples the URL queried is `/api/v1/samples/?c-<hashType>=<hashValue>`.  
 
+## CRITs Integration Options
+
+### CRITs Hostname
+
+The hostname for your CRITs server including "http://" or "https://" as required.
+
+### API Key
+
+Your API key for authenticating to CRITs
+
+### Username
+
+Your CRITs username.
+
+### Lookup IP Address Resources
+
+If checked, the integration will lookup IP addresses on your screen against your CRITs instance.
+
+### Lookup Hashes
+
+If checked, the integration will lookup MD5, SHA1 and SHA256 indicators on your screen against your CRITs instance.
+
+### Lookup Domains
+
+If checked, the integration will lookup domains on your screen against your CRITs instance.
+
 ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
