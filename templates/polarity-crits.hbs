@@ -4,105 +4,12 @@ the "Detail Block" within the notification window which is the data you see when
 In this template we are iterating over all the key-value pairs in `block.data.details` which maps directly back to
 object we returned from our doLookup method inside `integration.js`
 --}}
-{{#if (not-eq block.data.details.type 'hash')}}
 
-    <div class="crits-link section">
-        <a href="{{block.data.details.critsLookupUrl}}">View in CRITs</a> <i class="btb bt-external-link"></i>
-        {{#if block.isCached}}
-            <i>(cached)</i>
-        {{/if}}
-    </div>
-    <div class="description section">
-        {{#unless editDescriptionMode}}
-            {{#if block.data.details.description}}
-                {{block.data.details.description}}
-            {{else}}
-                <span class="no-data">No Description provided</span>
-            {{/if}}
-        {{!--
-            <i {{action "editDescription"}} class="btn btn-default btn-xs btb bt-edit description-edit-btn pull-right"></i>
-            --}}
-        {{/unless}}
-        {{!--
-        {{#if editDescriptionMode}}
-            {{textarea value=block.data.details.description}}
-        <div class="button-container">
-            {{editDescriptionErrorMessage}}
-            <button {{action "saveDescriptionEdit"}} class="btn material btn-default btn-xs">
-                <i class=" btb bt-check description-edit-btn pull-right"></i>
-                save
-            </button>
-            <button {{action "cancelDescriptionEdit"}} class="btn material btn-default btn-xs">
-                <i class="btb bt-times description-edit-btn pull-right"></i>
-                cancel
-            </button>
-        </div>
-        {{/if}}
-        --}}
-    </div>
-    <div class="buckets section">
-        {{#if (gt block.data.details.bucketList.length 0)}}
-            {{#each block.data.details.bucketList as |bucket|}}
-                <span class="bucket">
-                    {{bucket}}
-                </span>
-            {{/each}}
-        {{else}}
-            <span class="no-data">No Tags Specified</span>
-        {{/if}}
-    </div>
-    <div class="source section">
-        <h2><i class="bts bt-fw bt-map-marker integration-text-bold-color"></i> Sources</h2>
-        {{#if (gt block.data.details.source.length 0)}}
-            <ul>
-                {{#each block.data.details.source as |source|}}
-                    <li>{{source.name}}</li>
-                {{/each}}
-            </ul>
-        {{else}}
-            <span class="no-data">No Sources Specified</span>
-        {{/if}}
-    </div>
+{{!--
+Render hash types
+--}}
 
-    <div class="campaign section">
-        <h2><i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i> Campaigns</h2>
-        <table>
-            <thead>
-            <th>Name</th>
-            <th>Analyst</th>
-            <th>Confidence</th>
-            <th>Date</th>
-            </thead>
-            <tbody>
-            {{#each block.data.details.campaign as |campaign|}}
-                <tr>
-                    <td>{{campaign.name}}</td>
-                    <td>{{campaign.analyst}}</td>
-                    <td>{{campaign.confidence}}</td>
-                    <td>{{moment-time campaign.date}}</td>
-                </tr>
-            {{/each}}
-            </tbody>
-        </table>
-    </div>
-
-
-    <div class="threat-types section">
-        <h2><i class="fa fa-fw fa-bug integration-text-bold-color"></i> Threat Types</h2>
-        {{#if (gt block.data.details.threatTypes.length 0)}}
-            {{#each block.data.details.threatTypes as |threat|}}
-                {{threat}}
-            {{/each}}
-        {{else}}
-            <span class="no-data">No Threat Types Specified</span>
-        {{/if}}
-    </div>
-
-    <div class="last-modified last-section">
-        Last Modified: {{block.data.details.modified}}
-    </div>
-{{else}}
-
+{{#if (eq block.data.details.type 'hash')}}
     {{#if (gt block.data.details.hashSamples.length 0)}}
         <div class="title-bar">
             <h1>Samples</h1>
@@ -247,4 +154,258 @@ object we returned from our doLookup method inside `integration.js`
             </div>
         {{/each}}
     </div>
+{{else}}
+
+{{!--
+Render ip types
+--}}
+    {{#if (eq block.data.details.type 'ip')}}
+        {{#if (gt block.data.details.IPIndicator.length 0)}}
+            <div class="title-bar">
+                <h1>Indicators</h1>
+                {{#if block.isCached}}
+                    <span class="cached">(cached)</span>
+                {{/if}}
+            </div>
+        {{/if}}
+        <div class="section">
+            {{#each block.data.details.IPIndicator as |indicator|}}
+            {{!--
+            <div class="description section">
+                {{#if indicator.filename}}
+                    {{indicator.filename}}
+                {{else}}
+                    <span class="no-data">No Filename Provided</span>
+                {{/if}}
+            </div>
+            --}}
+                <div class="crits-link section">
+                    <a href="{{indicator.critsLookupUrl}}">View in CRITs</a> <i class="btb bt-external-link"></i>
+                    {{#if block.isCached}}
+                        <i>(cached)</i>
+                    {{/if}}
+                </div>
+                <div class="description section">
+                    {{#if indicator.description}}
+                        {{indicator.description}}
+                    {{else}}
+                        <span class="no-data">No Description provided</span>
+                    {{/if}}
+                </div>
+                <div class="buckets section">
+                    {{#if (gt indicator.bucketList.length 0)}}
+                        {{#each indicator.bucketList as |bucket|}}
+                            <span class="bucket">
+                                {{bucket}}
+                            </span>
+                        {{/each}}
+                    {{else}}
+                        <span class="no-data">No Tags Specified</span>
+                    {{/if}}
+                </div>
+                <div class="source section">
+                    <h2><i class="bts bt-fw bt-map-marker integration-text-bold-color"></i> Sources</h2>
+                    {{#if (gt indicator.source.length 0)}}
+                        <ul>
+                            {{#each indicator.source as |source|}}
+                                <li>{{source.name}}</li>
+                            {{/each}}
+                        </ul>
+                    {{else}}
+                        <span class="no-data">No Sources Specified</span>
+                    {{/if}}
+                </div>
+                <div class="campaign section">
+                    <h2><i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i> Campaigns</h2>
+                    <table>
+                        <thead>
+                        <th>Name</th>
+                        <th>Analyst</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                        </thead>
+                        <tbody>
+                        {{#each indicator.campaign as |campaign|}}
+                            <tr>
+                                <td>{{campaign.name}}</td>
+                                <td>{{campaign.analyst}}</td>
+                                <td>{{campaign.confidence}}</td>
+                                <td>{{moment-time campaign.date}}</td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/each}}
+        </div>
+
+
+        {{#if (gt block.data.details.IPObject.length 0)}}
+            <div class="title-bar">
+                <h1>IPs</h1>
+                {{#if block.isCached}}
+                    <span class="cached">(cached)</span>
+                {{/if}}
+            </div>
+        {{/if}}
+        <div class="section">
+            {{#each block.data.details.IPObject as |ip|}}
+                <div class="crits-link section">
+                    <a href="{{ip.critsLookupUrl}}">View in CRITs</a> <i class="btb bt-external-link"></i>
+                </div>
+                <div class="description section">
+                    {{#if ip.description}}
+                        {{ip.description}}
+                    {{else}}
+                        <span class="no-data">No Description provided</span>
+                    {{/if}}
+                </div>
+                <div class="buckets section">
+                    {{#if (gt ip.bucketList.length 0)}}
+                        {{#each ip.bucketList as |bucket|}}
+                            <span class="bucket">
+                                {{bucket}}
+                            </span>
+                        {{/each}}
+                    {{else}}
+                        <span class="no-data">No Tags Specified</span>
+                    {{/if}}
+                </div>
+                <div class="source section">
+                    <h2><i class="bts bt-fw bt-map-marker integration-text-bold-color"></i> Sources</h2>
+                    {{#if (gt ip.source.length 0)}}
+                        <ul>
+                            {{#each ip.source as |source|}}
+                                <li>{{source.name}}</li>
+                            {{/each}}
+                        </ul>
+                    {{else}}
+                        <span class="no-data">No Sources Specified</span>
+                    {{/if}}
+                </div>
+                <div class="campaign section">
+                    <h2><i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i> Campaigns</h2>
+                    <table>
+                        <thead>
+                        <th>Name</th>
+                        <th>Analyst</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                        </thead>
+                        <tbody>
+                        {{#each ip.campaign as |campaign|}}
+                            <tr>
+                                <td>{{campaign.name}}</td>
+                                <td>{{campaign.analyst}}</td>
+                                <td>{{campaign.confidence}}</td>
+                                <td>{{moment-time campaign.date}}</td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/each}}
+        </div>
+    {{else}}
+
+    {{!--
+    Default rendering
+    --}}
+
+        <div class="crits-link section">
+            <a href="{{block.data.details.critsLookupUrl}}">View in CRITs</a> <i class="btb bt-external-link"></i>
+            {{#if block.isCached}}
+                <i>(cached)</i>
+            {{/if}}
+        </div>
+        <div class="description section">
+            {{#unless editDescriptionMode}}
+                {{#if block.data.details.description}}
+                    {{block.data.details.description}}
+                {{else}}
+                    <span class="no-data">No Description provided</span>
+                {{/if}}
+            {{!--
+                <i {{action "editDescription"}} class="btn btn-default btn-xs btb bt-edit description-edit-btn pull-right"></i>
+                --}}
+            {{/unless}}
+            {{!--
+            {{#if editDescriptionMode}}
+                {{textarea value=block.data.details.description}}
+            <div class="button-container">
+                {{editDescriptionErrorMessage}}
+                <button {{action "saveDescriptionEdit"}} class="btn material btn-default btn-xs">
+                    <i class=" btb bt-check description-edit-btn pull-right"></i>
+                    save
+                </button>
+                <button {{action "cancelDescriptionEdit"}} class="btn material btn-default btn-xs">
+                    <i class="btb bt-times description-edit-btn pull-right"></i>
+                    cancel
+                </button>
+            </div>
+            {{/if}}
+            --}}
+        </div>
+        <div class="buckets section">
+            {{#if (gt block.data.details.bucketList.length 0)}}
+                {{#each block.data.details.bucketList as |bucket|}}
+                    <span class="bucket">
+                        {{bucket}}
+                    </span>
+                {{/each}}
+            {{else}}
+                <span class="no-data">No Tags Specified</span>
+            {{/if}}
+        </div>
+        <div class="source section">
+            <h2><i class="bts bt-fw bt-map-marker integration-text-bold-color"></i> Sources</h2>
+            {{#if (gt block.data.details.source.length 0)}}
+                <ul>
+                    {{#each block.data.details.source as |source|}}
+                        <li>{{source.name}}</li>
+                    {{/each}}
+                </ul>
+            {{else}}
+                <span class="no-data">No Sources Specified</span>
+            {{/if}}
+        </div>
+
+        <div class="campaign section">
+            <h2><i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i> Campaigns</h2>
+            <table>
+                <thead>
+                <th>Name</th>
+                <th>Analyst</th>
+                <th>Confidence</th>
+                <th>Date</th>
+                </thead>
+                <tbody>
+                {{#each block.data.details.campaign as |campaign|}}
+                    <tr>
+                        <td>{{campaign.name}}</td>
+                        <td>{{campaign.analyst}}</td>
+                        <td>{{campaign.confidence}}</td>
+                        <td>{{moment-time campaign.date}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="threat-types section">
+            <h2><i class="fa fa-fw fa-bug integration-text-bold-color"></i> Threat Types</h2>
+            {{#if (gt block.data.details.threatTypes.length 0)}}
+                {{#each block.data.details.threatTypes as |threat|}}
+                    {{threat}}
+                {{/each}}
+            {{else}}
+                <span class="no-data">No Threat Types Specified</span>
+            {{/if}}
+        </div>
+
+        <div class="last-modified last-section">
+            Last Modified: {{block.data.details.modified}}
+        </div>
+    {{/if}}
 {{/if}}
