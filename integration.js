@@ -13,13 +13,14 @@ function startup(logger) {
     Logger = logger;
 }
 
-
 /**
  The doLookup method is called each time 1 or more entity objects needs to be looked up by the integration.  It is
  called on a per user basis. The method is passed an array of entity objects which have the following structure:
 
  ```json
  {
+     type: 'IPv4',
+     types: ['IP', 'IPv4']
      isIP: true,
      isIPv4: true,
      isIPv6: false,
@@ -32,12 +33,8 @@ function startup(logger) {
      isSHA256: false,
      isSHA512: false,
      hashType: '',
-     isGeo: false,
      isEmail: false,
      isURL: false,
-     isHTMLTag: false,
-     latitude: 0,
-     longitude: 0,
      value: '56.2.3.1',
      IPLong: 939655937
      }
@@ -60,20 +57,27 @@ function startup(logger) {
  @param cb callback function
  */
 function doLookup(entities, options, cb) {
-    let validationResult = _validateOptions(options);
-    if (validationResult !== null) {
-        cb(validationResult);
-        return;
-    }
+    let domainBlackListRegex;
 
+    if (typeof options.domainBlackList === 'string' && options.domainBlackList.length > 0) {
+        domainBlackListRegex = new RegExp(options.domainBlackList, 'i');
+    }
 
     let lookupResults = [];
 
     async.each(entities, function (entityObj, next) {
         Logger.trace({entity: entityObj.value}, 'Looking up Entity');
+
         if (entityObj.isIP && options.lookupIps) {
-            Logger.trace({entity: entityObj.value}, 'Looking up IP');
-            _lookupIP(entityObj, options, function (err, results) {
+            Logger.debug({entity: entityObj.value}, 'Looking up IP');
+            if(entityObj.isIPv6){
+                // CRITs only supports IPv6 addresses that are all lowercase and "compressed"
+                // i.e., not expanded out with 0's
+                entityObj.value = entityObj.value.toLowerCase();
+                entityObj.value = entityObj.value.replace(/(:0{1,4})+/, ':');
+            }
+            Logger.debug({entity: entityObj.value}, 'Looking up IP');
+            _lookupIPs(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
                 } else {
@@ -84,7 +88,7 @@ function doLookup(entities, options, cb) {
                 }
             });
         } else if ((entityObj.isMD5 || entityObj.isSHA1 || entityObj.isSHA256) && options.lookupHashes) {
-            Logger.trace({entity: entityObj.value}, 'Looking up Hash');
+            Logger.debug({entity: entityObj.value}, 'Looking up Hash');
             _lookupHash(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
@@ -96,7 +100,15 @@ function doLookup(entities, options, cb) {
                 }
             });
         } else if (entityObj.isDomain && options.lookupDomains) {
-            Logger.trace({entity: entityObj.value}, 'Looking up Domain');
+            if (typeof domainBlackListRegex !== 'undefined') {
+                if (domainBlackListRegex.test(entityObj.value)) {
+                    Logger.debug({domain: entityObj.value}, 'Blocked BlackListed Domain Lookup');
+                    next(null);
+                    return;
+                }
+            }
+
+            Logger.debug({entity: entityObj.value}, 'Looking up Domain');
             _lookupDomains(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
@@ -120,9 +132,13 @@ function doLookup(entities, options, cb) {
          *      the error.  This is a good place to return errors related to API authentication or other issues.     *
          * @parameter lookupResults An array of lookup result objects
          */
-        Logger.debug({lookupResults: lookupResults}, 'Lookup Results');
+        Logger.trace({lookupResults: lookupResults}, 'Lookup Results');
         cb(err, lookupResults);
     });
+}
+
+function _getIndicatorIPUri(value, type, options) {
+    return _getFormattedHostname(options) + '/api/v1/indicators/?c-type=' + type + '%20Address&c-value=' + value + _getUriAuthQueryParam(options);
 }
 
 function _getHashSampleUri(hashType, value, options) {
@@ -167,6 +183,11 @@ function _getCritsDomainUrl(options, object) {
     return _getFormattedHostname(options) + '/domains/details/' + object.domain + '/';
 }
 
+// URLs
+function _getCritsIndicatorUrl(options, object) {
+    return _getFormattedHostname(options) + '/indicators/details/' + object._id + '/';
+}
+
 /**
  * Removes trailing slash if the user added one
  *
@@ -179,6 +200,7 @@ function _getFormattedHostname(options) {
     if (hostname.endsWith("/")) {
         hostname = hostname.substring(0, hostname.length - 1);
     }
+
     return hostname;
 }
 
@@ -291,62 +313,174 @@ function _getErrorMessage(err, response, body) {
     return null;
 }
 
-function _lookupIP(entityObj, options, cb) {
-    request({
-        uri: _getIpUri(entityObj.value, options),
-        method: 'GET',
-        json: true,
-        rejectUnauthorized: false
-    }, function (err, response, body) {
-        // check for an error
-        let error = _getErrorMessage(err, response, body);
-        if (error !== null) {
-            cb(error);
+function _processMultipleResults(err, response, body, cb) {
+    let error = _getErrorMessage(err, response, body);
+
+    if (error !== null) {
+        cb(error);
+        return;
+    }
+
+    let critObjects = body.objects;
+
+    cb(null, critObjects);
+}
+
+function _lookupIPs(entityObj, options, cb) {
+    async.parallel({
+        // Indicator subcategory IPv4
+        IPIndicator: function (parallelCb) {
+            request({
+                uri: _getIndicatorIPUri(entityObj.value, entityObj.type, options),
+                method: 'GET',
+                json: true,
+                rejectUnauthorized: false
+            }, function (err, response, body) {
+                _processMultipleResults(err, response, body, parallelCb);
+            });
+        },
+        // IP indicator
+        IPObject: function (parallelCb) {
+            request({
+                uri: _getIpUri(entityObj.value, options),
+                method: 'GET',
+                json: true,
+                rejectUnauthorized: false
+            }, function (err, response, body) {
+                _processMultipleResults(err, response, body, parallelCb);
+            });
+        }
+    }, function (err, results) {
+        if (err) {
+            cb(err);
             return;
         }
 
-        let critObjects = body.objects;
-        let results = [];
-
-        if (critObjects.length === 0) {
-            // no data so we add a null result which will cache this entity as a miss in
-            // crits
-            results.push({
-                entity: entityObj,
-                data: null
-            })
-        } else {
-            for (let i = 0; i < critObjects.length; i++) {
-                let object = critObjects[i];
-                let critsLookupUrl = _getCritsIpUrl(options, object);
-
-                results.push({
-                    entity: entityObj,
-                    displayValue: object.ip,
-                    // Required: An object containing everything you want passed to the template
-                    data: {
-                        // Required: These are the tags that are displayed in your template
-                        summary: _createTags(object),
-                        // Data that you want to pass back to the notification window details block
-                        details: {
-                            type: 'ip',
-                            critsLookupUrl: critsLookupUrl,
-                            bucketList: object.bucket_list,
-                            campaign: object.campaign,
-                            description: object.description,
-                            modified: object.modified,
-                            source: object.source,
-                            threatTypes: object.threat_types,
-                            patchDescriptionUri: _getPatchDescriptionUri('ips', object._id, options)
-                        }
-                    }
-                })
+        // test
+        let payload = {
+            entity: entityObj,
+            data: {
+                details: {
+                    type: 'ip',
+                    IPIndicator: [],
+                    IPObject: []
+                }
             }
+        };
+
+        // Indicator subcategory IPv4
+        results.IPIndicator.forEach(function (critsObject) {
+            payload.data.details.IPIndicator.push({
+                critsLookupUrl: _getCritsIndicatorUrl(options, critsObject),
+                bucketList: critsObject.bucket_list,
+                campaign: critsObject.campaign,
+                description: critsObject.description,
+                modified: critsObject.modified,
+                source: critsObject.source,
+                threatTypes: critsObject.threat_types,
+                patchDescriptionUri: _getIndicatorIPUri(critsObject.value, entityObj.type, options)
+            })
+        });
+
+        // IP indicator type
+        results.IPObject.forEach(function (critsObject) {
+            payload.data.details.IPObject.push({
+                critsLookupUrl: _getCritsIpUrl(options, critsObject),
+                bucketList: critsObject.bucket_list,
+                campaign: critsObject.campaign,
+                description: critsObject.description,
+                modified: critsObject.modified,
+                source: critsObject.source,
+                threatTypes: critsObject.threat_types,
+                patchDescriptionUri: _getPatchDescriptionUri('ips', critsObject._id, options)
+            })
+        });
+
+        if (results.IPIndicator.length === 0 && results.IPObject.length === 0) {
+            payload.data = null;
+        } else {
+            payload.data.summary = _createIPTags(payload.data.details);
         }
 
-        cb(null, results);
+        cb(null, [payload]);
     });
 }
+
+function _createIPTags(details) {
+    let tags = [];
+
+    let uniqueSources = new Set();
+    let uniqueCampaigns = new Set();
+    let uniqueBucketLists = new Set();
+
+    // push number of samples if any
+    if (details.IPIndicator.length === 1) {
+        tags.push(details.IPIndicator.length + ' <i class="fa fa-bug integration-text-bold-color"></i>');
+    } else if (details.IPIndicator.length > 1) {
+        tags.push(details.IPIndicator.length + ' <i class="fa fa-bug integration-text-bold-color"></i>');
+    }
+
+    details.IPIndicator.forEach(function (indicator) {
+        // push source(s)
+        if (Array.isArray(indicator.source)) {
+            indicator.source.forEach(function (source) {
+                uniqueSources.add(source.name + _createSourceMarker());
+            });
+        }
+
+        // push campaign name(s)
+        if (Array.isArray(indicator.campaign)) {
+            indicator.campaign.forEach(function (campaign) {
+                uniqueCampaigns.add(campaign.name + _createCampaignMarker());
+            });
+        }
+
+        // push bucket_list (array of tags)
+        if (Array.isArray(indicator.bucket_list)) {
+            indicator.bucket_list.forEach(function (bucket) {
+                uniqueBucketLists.add(bucket);
+            });
+        }
+    });
+
+    details.IPObject.forEach(function (ip) {
+        // push source(s)
+        if (Array.isArray(ip.source)) {
+            ip.source.forEach(function (source) {
+                uniqueSources.add(source.name + _createSourceMarker());
+            });
+        }
+
+        // push campaign name(s)
+        if (Array.isArray(ip.campaign)) {
+            ip.campaign.forEach(function (campaign) {
+                uniqueCampaigns.add(campaign.name + _createCampaignMarker());
+            });
+        }
+
+        // push bucket_list (array of tags)
+        if (Array.isArray(ip.bucket_list)) {
+            ip.bucket_list.forEach(function (bucket) {
+                uniqueBucketLists.add(bucket);
+            });
+        }
+    });
+
+    uniqueSources.forEach(function (source) {
+        tags.push(source);
+    });
+
+    uniqueCampaigns.forEach(function (campaign) {
+        tags.push(campaign);
+    });
+
+    uniqueBucketLists.forEach(function (bucket) {
+        tags.push(bucket);
+    });
+
+    return tags;
+}
+
 
 function _lookupDomains(entityObj, options, cb) {
     request({
@@ -410,7 +544,7 @@ function _createSourceMarker() {
     //return "<span class='tag-marker ' title='Source'>S</span> "
 }
 
-function _createCampaignMarkger() {
+function _createCampaignMarker() {
     return ' <i class="fa fa-fw fa-bullhorn integration-text-bold-color"></i>';
     //return "<span class='tag-marker' title='Campaign'>C</span> "
 }
@@ -432,21 +566,21 @@ function _createHashTags(details) {
     details.hashSamples.forEach(function (sample) {
         // push source(s)
         if (Array.isArray(sample.source)) {
-            sample.source.forEach(function(source){
-               uniqueSources.add(source.name + _createSourceMarker());
+            sample.source.forEach(function (source) {
+                uniqueSources.add(source.name + _createSourceMarker());
             });
         }
 
         // push campaign name(s)
         if (Array.isArray(sample.campaign)) {
-            sample.campaign.forEach(function(campaign){
-               uniqueCampaigns.add(campaign.name + _createCampaignMarkger());
+            sample.campaign.forEach(function (campaign) {
+                uniqueCampaigns.add(campaign.name + _createCampaignMarker());
             });
         }
 
         // push bucket_list (array of tags)
         if (Array.isArray(sample.bucket_list)) {
-            sample.bucket_list.forEach(function(bucket){
+            sample.bucket_list.forEach(function (bucket) {
                 uniqueBucketLists.add(bucket);
             });
         }
@@ -455,35 +589,35 @@ function _createHashTags(details) {
     details.hashIndicators.forEach(function (indicator) {
         // push source(s)
         if (Array.isArray(indicator.source)) {
-            indicator.source.forEach(function(source){
+            indicator.source.forEach(function (source) {
                 uniqueSources.add(source.name + _createSourceMarker());
             });
         }
 
         // push campaign name(s)
         if (Array.isArray(indicator.campaign)) {
-            indicator.campaign.forEach(function(campaign){
-                uniqueCampaigns.add(campaign.name + _createCampaignMarkger());
+            indicator.campaign.forEach(function (campaign) {
+                uniqueCampaigns.add(campaign.name + _createCampaignMarker());
             });
         }
 
         // push bucket_list (array of tags)
         if (Array.isArray(indicator.bucket_list)) {
-            indicator.bucket_list.forEach(function(bucket){
+            indicator.bucket_list.forEach(function (bucket) {
                 uniqueBucketLists.add(bucket);
             });
         }
     });
 
-    uniqueSources.forEach(function(source){
+    uniqueSources.forEach(function (source) {
         tags.push(source);
     });
 
-    uniqueCampaigns.forEach(function(campaign){
+    uniqueCampaigns.forEach(function (campaign) {
         tags.push(campaign);
     });
 
-    uniqueBucketLists.forEach(function(bucket){
+    uniqueBucketLists.forEach(function (bucket) {
         tags.push(bucket);
     });
 
@@ -503,7 +637,7 @@ function _createTags(object) {
     // push campaign name(s)
     if (Array.isArray(object.campaign) && object.campaign.length > 0) {
         for (var i = 0; i < object.campaign.length; i++) {
-            tags.push(object.campaign[i].name + _createCampaignMarkger());
+            tags.push(object.campaign[i].name + _createCampaignMarker());
         }
     }
 
@@ -517,47 +651,49 @@ function _createTags(object) {
     return tags;
 }
 
-/**
- * Options to validate
- *
- * hostname
- * username
- * apiKey
- * lookupHashes
- * lookupIps
- *
- * @param options
- * @private
- */
-function _validateOptions(options) {
-    if (typeof options.hostname !== 'string') {
-        return 'No hostname set';
+function validateOptions(userOptions, cb) {
+    let errors = [];
+
+    if (typeof userOptions.apiKey.value !== 'string' ||
+        (typeof userOptions.apiKey.value === 'string' && userOptions.apiKey.value.length === 0)) {
+        errors.push({
+            key: 'apiKey',
+            message: 'You must provide a CRITs API key'
+        })
     }
 
-    if (options.hostname.length === 0) {
-        return 'Hostname must be at least 1 character';
+    if (typeof userOptions.hostname.value !== 'string' ||
+        (typeof userOptions.hostname.value === 'string' && userOptions.hostname.value.length === 0)) {
+        errors.push({
+            key: 'hostname',
+            message: 'You must provide a hostname'
+        })
     }
 
-    if (typeof options.apiKey !== 'string') {
-        return 'No API key set';
+    if (typeof userOptions.username.value !== 'string' ||
+        (typeof userOptions.username.value === 'string' && userOptions.username.value.length === 0)) {
+        errors.push({
+            key: 'username',
+            message: 'You must provide a username'
+        })
     }
 
-    if (options.apiKey.length === 0) {
-        return 'API key must be at least 1 character';
+    if (typeof userOptions.domainBlackList.value === 'string' && userOptions.domainBlackList.value.length > 0) {
+        try {
+            new RegExp(userOptions.domainBlackList.value);
+        } catch (e) {
+            errors.push({
+                key: 'domainBlackList',
+                message: 'The regular expression you provided is not valid'
+            })
+        }
     }
 
-    if (typeof options.username !== 'string') {
-        return 'No username set';
-    }
-
-    if (options.username.length === 0) {
-        return 'Username must be at least 1 character';
-    }
-
-    return null;
+    cb(null, errors);
 }
 
 module.exports = {
     doLookup: doLookup,
-    startup: startup
+    startup: startup,
+    validateOptions: validateOptions
 };

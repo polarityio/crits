@@ -5,7 +5,7 @@ module.exports = {
      * @type String
      * @required
      */
-    "name": "CRITs",
+    name: "CRITs",
     /**
      * The acronym that appears in the notification window when information from this integration
      * is displayed.  Note that the acronym is included as part of each "tag" in the summary information
@@ -15,14 +15,21 @@ module.exports = {
      * @type String
      * @required
      */
-    "acronym":"CRIT",
+    acronym: "CRIT",
+    /**
+     * Array of entity types that you want sent to this integration
+     *
+     * @type String[]
+     * @required
+     */
+    entityTypes: ["IPv4", "IPv6", "domain", "hash"],
     /**
      * Description for this integration which is displayed in the Polarity integrations user interface
      *
      * @type String
      * @optional
      */
-    "description": "Integration for CRITs, an open source malware and threat repository",
+    description: "Integration for CRITs, an open source malware and threat repository",
     /**
      * An array of style files (css or less) that will be included for your integration. Any styles specified in
      * the below files can be used in your custom template.
@@ -30,7 +37,7 @@ module.exports = {
      * @type Array
      * @optional
      */
-    "styles":[
+    styles: [
         "./styles/polarity-crits.less"
     ],
     /**
@@ -41,15 +48,18 @@ module.exports = {
      * @type Object
      * @optional
      */
-    "block": {
-        "component": {
-            "file": "./components/polarity-crits.js"
+    block: {
+        component: {
+            file: "./components/polarity-crits.js"
         },
-        "template": {
-            "file": "./templates/polarity-crits.hbs"
+        template: {
+            file: "./templates/polarity-crits.hbs"
         }
     },
-    "logging": { level: 'info'},
+    /**
+     * The level of logging for this integration. Valid values are 'info', 'debug', 'trace', 'warning', 'error'
+     */
+    logging: {level: "info"},
     /**
      * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
      * as an array of option objects.
@@ -57,15 +67,15 @@ module.exports = {
      * @type Array
      * @optional
      */
-    "options":[
+    options: [
         {
-            "key": "hostname",
-            "name": "CRITs Hostname",
-            "description": 'The hostname for your CRITs server including "http://" or "https://" as required.',
-            "default":"",
-            "type": "text",
-            "userCanEdit": false,
-            "adminOnly": true
+            key: "hostname",
+            name: "CRITs Hostname",
+            description: 'The hostname for your CRITs server including "http://" or "https://" as required.',
+            default: "",
+            type: "text",
+            userCanEdit: false,
+            adminOnly: true
         },
         {
             /**
@@ -75,21 +85,21 @@ module.exports = {
              * @property key
              * @type String
              */
-            "key"         : "apiKey",
+            key: "apiKey",
             /**
              * Human Readable name for the option which will be displayed in the Polarity user interface
              *
              * @property name
              * @type String
              */
-            "name"        : "API Key",
+            name: "API Key",
             /**
              * A short description for what the option does.  This description is displayed in the user interface
              *
              * @property description
              * @type String
              */
-            "description" : "Your API key for authenticating to CRITs",
+            description: "Your API key for authenticating to CRITs",
             /**
              * The default value for the option.  Note this value can be either a String or Boolean depending on
              * the @type specified by the `type` property.
@@ -97,14 +107,14 @@ module.exports = {
              * @property default
              * @type String|Boolean
              */
-            "default"     : "",
+            default: "",
             /**
-             * The type for this option.  Can be either "string", "boolean", or "password"
+             * The type for this option.  Can be either "text", "boolean", or "password"
              *
              * @property type
              * @type String
              */
-            "type"        : "text",
+            type: "text",
             /**
              * If `true`, non-admin users can edit the value of this option and the option will be stored on a
              * per-user basis.  If `false`, the option will be server wide.  Note that for this setting to have
@@ -113,7 +123,7 @@ module.exports = {
              * @property user-can-edit
              * @type Boolean
              */
-            "userCanEdit" : true,
+            userCanEdit: true,
             /**
              * If set to true, the setting can only be viewed by admins.  For all other users the setting will not appear.
              * Note that if `admin-only` is set to true the value of `user-can-edit` is not applicable.
@@ -121,43 +131,52 @@ module.exports = {
              * @property admin-only
              * @type Boolean
              */
-            "adminOnly"    : false
+            adminOnly: false
         },
         {
-            "key": "username",
-            "name": "Username",
-            "description": "Your CRITs username",
-            "default":"",
-            "type": "text",
-            "userCanEdit": true,
-            "adminOnly": false
+            key: "username",
+            name: "Username",
+            description: "Your CRITs username",
+            default: "",
+            type: "text",
+            userCanEdit: true,
+            adminOnly: false
         },
         {
-            "key": "lookupIps",
-            "name": "Lookup IP Address Resources",
-            "description": "If checked, the integration will lookup IP addresses",
-            "default":true,
-            "type": "boolean",
-            "userCanEdit": true,
-            "adminOnly": false
+            key: "domainBlackList",
+            name: "Domain Black List Regex",
+            description: "Domains that match the given regex will not be looked up (if blank no domains will be black listed)",
+            default: "",
+            type: "text",
+            userCanEdit: true,
+            adminOnly: false
         },
         {
-            "key": "lookupHashes",
-            "name": "Lookup Hashes",
-            "description": "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
-            "default":true,
-            "type": "boolean",
-            "userCanEdit": true,
-            "adminOnly": false
+            key: "lookupIps",
+            name: "Lookup IP Address Resources",
+            description: "If checked, the integration will lookup IP addresses",
+            default: true,
+            type: "boolean",
+            userCanEdit: true,
+            adminOnly: false
         },
         {
-            "key": "lookupDomains",
-            "name": "Lookup Domains",
-            "description": "If checked, the integration will lookup domains",
-            "default":true,
-            "type": "boolean",
-            "userCanEdit": true,
-            "adminOnly": false
+            key: "lookupHashes",
+            name: "Lookup Hashes",
+            description: "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
+            default: true,
+            type: "boolean",
+            userCanEdit: true,
+            adminOnly: false
+        },
+        {
+            key: "lookupDomains",
+            name: "Lookup Domains",
+            description: "If checked, the integration will lookup domains",
+            default: true,
+            type: "boolean",
+            userCanEdit: true,
+            adminOnly: false
         }
     ]
 };

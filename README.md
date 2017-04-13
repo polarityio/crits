@@ -6,8 +6,7 @@ The Polarity CRITs integration allows Polarity to search your CRITs deployment f
 CRITs is an open source malware and threat repository that leverages other open source software to create a unified tool for analysts and security experts engaged in threat defense. It has been in development since 2010 with one goal in mind: give the security community a flexible and open platform for analyzing and collaborating on threat data. For more information about CRITs please see [https://crits.github.io]().
 
 
-| ![image](https://cloud.githubusercontent.com/assets/306319/24310755/86b712d2-10a7-11e7-8469-9c69184f450b.png)
- |
+| ![image](https://cloud.githubusercontent.com/assets/306319/24310755/86b712d2-10a7-11e7-8469-9c69184f450b.png) |
 |---|
 |*CRITs Lookup of MD5 Hash* |
 
@@ -19,7 +18,7 @@ Domains are currently searched as their own resource (not as an indicator) by qu
 
 ### IP Addresses
 
-The Polarity CRITs integration currently searches for IPv4 and IPv6 (including RFC 1918 addresses) entities as a resource by querying the URL `/api/v1/ips`.  
+The Polarity CRITs integration currently searches for IPv4 and IPv6 (including RFC 1918 addresses) entities as a resource and indicator type by querying the URL `/api/v1/ips` and `/api/v1/indicators?c-type=ip&c-lower=<ipValue>`.  
 
 ### Hashes
 
