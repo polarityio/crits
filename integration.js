@@ -20,6 +20,8 @@ function startup(logger) {
 
  ```json
  {
+     type: 'IPv4',
+     types: ['IP', 'IPv4']
      isIP: true,
      isIPv4: true,
      isIPv6: false,
@@ -32,12 +34,8 @@ function startup(logger) {
      isSHA256: false,
      isSHA512: false,
      hashType: '',
-     isGeo: false,
      isEmail: false,
      isURL: false,
-     isHTMLTag: false,
-     latitude: 0,
-     longitude: 0,
      value: '56.2.3.1',
      IPLong: 939655937
      }
@@ -60,19 +58,19 @@ function startup(logger) {
  @param cb callback function
  */
 function doLookup(entities, options, cb) {
-    let validationResult = _validateOptions(options);
-    if (validationResult !== null) {
-        cb(validationResult);
-        return;
-    }
+    let domainBlackListRegex;
 
+    if(typeof options.domainBlackList === 'string' && options.domainBlackList.length > 0){
+        domainBlackListRegex = new RegExp(options.domainBlackList, 'i');
+    }
 
     let lookupResults = [];
 
     async.each(entities, function (entityObj, next) {
         Logger.trace({entity: entityObj.value}, 'Looking up Entity');
+
         if (entityObj.isIP && options.lookupIps) {
-            Logger.trace({entity: entityObj.value}, 'Looking up IP');
+            Logger.debug({entity: entityObj.value}, 'Looking up IP');
             _lookupIP(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
@@ -84,7 +82,7 @@ function doLookup(entities, options, cb) {
                 }
             });
         } else if ((entityObj.isMD5 || entityObj.isSHA1 || entityObj.isSHA256) && options.lookupHashes) {
-            Logger.trace({entity: entityObj.value}, 'Looking up Hash');
+            Logger.debug({entity: entityObj.value}, 'Looking up Hash');
             _lookupHash(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
@@ -96,7 +94,15 @@ function doLookup(entities, options, cb) {
                 }
             });
         } else if (entityObj.isDomain && options.lookupDomains) {
-            Logger.trace({entity: entityObj.value}, 'Looking up Domain');
+            if(typeof domainBlackListRegex !== 'undefined'){
+                if(domainBlackListRegex.test(entityObj.value)){
+                    Logger.debug({domain: entityObj.value}, 'Blocked BlackListed Domain Lookup');
+                    next(null);
+                    return;
+                }
+            }
+
+            Logger.debug({entity: entityObj.value}, 'Looking up Domain');
             _lookupDomains(entityObj, options, function (err, results) {
                 if (err) {
                     next(err);
@@ -120,7 +126,7 @@ function doLookup(entities, options, cb) {
          *      the error.  This is a good place to return errors related to API authentication or other issues.     *
          * @parameter lookupResults An array of lookup result objects
          */
-        Logger.debug({lookupResults: lookupResults}, 'Lookup Results');
+        Logger.trace({lookupResults: lookupResults}, 'Lookup Results');
         cb(err, lookupResults);
     });
 }
@@ -517,47 +523,49 @@ function _createTags(object) {
     return tags;
 }
 
-/**
- * Options to validate
- *
- * hostname
- * username
- * apiKey
- * lookupHashes
- * lookupIps
- *
- * @param options
- * @private
- */
-function _validateOptions(options) {
-    if (typeof options.hostname !== 'string') {
-        return 'No hostname set';
+function validateOptions(userOptions, cb) {
+    let errors = [];
+
+    if(typeof userOptions.apiKey.value !== 'string' ||
+        (typeof userOptions.apiKey.value === 'string' && userOptions.apiKey.value.length === 0)){
+        errors.push({
+            key: 'apiKey',
+            message: 'You must provide a CRITs API key'
+        })
     }
 
-    if (options.hostname.length === 0) {
-        return 'Hostname must be at least 1 character';
+    if(typeof userOptions.hostname.value !== 'string' ||
+        (typeof userOptions.hostname.value === 'string' && userOptions.hostname.value.length === 0)){
+        errors.push({
+            key: 'hostname',
+            message: 'You must provide a hostname'
+        })
     }
 
-    if (typeof options.apiKey !== 'string') {
-        return 'No API key set';
+    if(typeof userOptions.username.value !== 'string' ||
+        (typeof userOptions.username.value === 'string' && userOptions.username.value.length === 0)){
+        errors.push({
+            key: 'username',
+            message: 'You must provide a username'
+        })
     }
 
-    if (options.apiKey.length === 0) {
-        return 'API key must be at least 1 character';
+    if(typeof userOptions.domainBlackList.value === 'string' && userOptions.domainBlackList.value.length > 0){
+        try{
+            new RegExp(userOptions.domainBlackList.value);
+        }catch(e){
+            errors.push({
+                key: 'domainBlackList',
+                message: 'The regular expression you provided is not valid'
+            })
+        }
     }
 
-    if (typeof options.username !== 'string') {
-        return 'No username set';
-    }
-
-    if (options.username.length === 0) {
-        return 'Username must be at least 1 character';
-    }
-
-    return null;
+    cb(null, errors);
 }
 
 module.exports = {
     doLookup: doLookup,
-    startup: startup
+    startup: startup,
+    validateOptions: validateOptions
 };
