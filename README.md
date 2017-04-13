@@ -6,8 +6,7 @@ The Polarity CRITs integration allows Polarity to search your CRITs deployment f
 CRITs is an open source malware and threat repository that leverages other open source software to create a unified tool for analysts and security experts engaged in threat defense. It has been in development since 2010 with one goal in mind: give the security community a flexible and open platform for analyzing and collaborating on threat data. For more information about CRITs please see [https://crits.github.io]().
 
 
-| ![image](https://cloud.githubusercontent.com/assets/306319/24310755/86b712d2-10a7-11e7-8469-9c69184f450b.png)
- |
+| ![image](https://cloud.githubusercontent.com/assets/306319/24310755/86b712d2-10a7-11e7-8469-9c69184f450b.png) |
 |---|
 |*CRITs Lookup of MD5 Hash* |
 
