@@ -59,7 +59,7 @@ function startup(logger) {
 function doLookup(entities, options, cb) {
     let domainBlackListRegex;
 
-    if(typeof options.domainBlackList === 'string' && options.domainBlackList.length > 0){
+    if (typeof options.domainBlackList === 'string' && options.domainBlackList.length > 0) {
         domainBlackListRegex = new RegExp(options.domainBlackList, 'i');
     }
 
@@ -69,6 +69,13 @@ function doLookup(entities, options, cb) {
         Logger.trace({entity: entityObj.value}, 'Looking up Entity');
 
         if (entityObj.isIP && options.lookupIps) {
+            Logger.debug({entity: entityObj.value}, 'Looking up IP');
+            if(entityObj.isIPv6){
+                // CRITs only supports IPv6 addresses that are all lowercase and "compressed"
+                // i.e., not expanded out with 0's
+                entityObj.value = entityObj.value.toLowerCase();
+                entityObj.value = entityObj.value.replace(/(:0{1,4})+/, ':');
+            }
             Logger.debug({entity: entityObj.value}, 'Looking up IP');
             _lookupIPs(entityObj, options, function (err, results) {
                 if (err) {
@@ -93,8 +100,8 @@ function doLookup(entities, options, cb) {
                 }
             });
         } else if (entityObj.isDomain && options.lookupDomains) {
-            if(typeof domainBlackListRegex !== 'undefined'){
-                if(domainBlackListRegex.test(entityObj.value)){
+            if (typeof domainBlackListRegex !== 'undefined') {
+                if (domainBlackListRegex.test(entityObj.value)) {
                     Logger.debug({domain: entityObj.value}, 'Blocked BlackListed Domain Lookup');
                     next(null);
                     return;
@@ -130,8 +137,8 @@ function doLookup(entities, options, cb) {
     });
 }
 
-function _getIndicatorIPv4Uri(value, options) {
-    return _getFormattedHostname(options) + '/api/v1/indicators/?c-type=IPv4%20Address&c-value=' + value + _getUriAuthQueryParam(options);
+function _getIndicatorIPUri(value, type, options) {
+    return _getFormattedHostname(options) + '/api/v1/indicators/?c-type=' + type + '%20Address&c-value=' + value + _getUriAuthQueryParam(options);
 }
 
 function _getHashSampleUri(hashType, value, options) {
@@ -324,7 +331,7 @@ function _lookupIPs(entityObj, options, cb) {
         // Indicator subcategory IPv4
         IPIndicator: function (parallelCb) {
             request({
-                uri: _getIndicatorIPv4Uri(entityObj.value, options),
+                uri: _getIndicatorIPUri(entityObj.value, entityObj.type, options),
                 method: 'GET',
                 json: true,
                 rejectUnauthorized: false
@@ -371,7 +378,7 @@ function _lookupIPs(entityObj, options, cb) {
                 modified: critsObject.modified,
                 source: critsObject.source,
                 threatTypes: critsObject.threat_types,
-                patchDescriptionUri: _getIndicatorIPv4Uri(critsObject.value, options)
+                patchDescriptionUri: _getIndicatorIPUri(critsObject.value, entityObj.type, options)
             })
         });
 
@@ -416,21 +423,21 @@ function _createIPTags(details) {
     details.IPIndicator.forEach(function (indicator) {
         // push source(s)
         if (Array.isArray(indicator.source)) {
-            indicator.source.forEach(function(source){
+            indicator.source.forEach(function (source) {
                 uniqueSources.add(source.name + _createSourceMarker());
             });
         }
 
         // push campaign name(s)
         if (Array.isArray(indicator.campaign)) {
-            indicator.campaign.forEach(function(campaign){
+            indicator.campaign.forEach(function (campaign) {
                 uniqueCampaigns.add(campaign.name + _createCampaignMarker());
             });
         }
 
         // push bucket_list (array of tags)
         if (Array.isArray(indicator.bucket_list)) {
-            indicator.bucket_list.forEach(function(bucket){
+            indicator.bucket_list.forEach(function (bucket) {
                 uniqueBucketLists.add(bucket);
             });
         }
@@ -439,35 +446,35 @@ function _createIPTags(details) {
     details.IPObject.forEach(function (ip) {
         // push source(s)
         if (Array.isArray(ip.source)) {
-            ip.source.forEach(function(source){
+            ip.source.forEach(function (source) {
                 uniqueSources.add(source.name + _createSourceMarker());
             });
         }
 
         // push campaign name(s)
         if (Array.isArray(ip.campaign)) {
-            ip.campaign.forEach(function(campaign){
+            ip.campaign.forEach(function (campaign) {
                 uniqueCampaigns.add(campaign.name + _createCampaignMarker());
             });
         }
 
         // push bucket_list (array of tags)
         if (Array.isArray(ip.bucket_list)) {
-            ip.bucket_list.forEach(function(bucket){
+            ip.bucket_list.forEach(function (bucket) {
                 uniqueBucketLists.add(bucket);
             });
         }
     });
 
-    uniqueSources.forEach(function(source){
+    uniqueSources.forEach(function (source) {
         tags.push(source);
     });
 
-    uniqueCampaigns.forEach(function(campaign){
+    uniqueCampaigns.forEach(function (campaign) {
         tags.push(campaign);
     });
 
-    uniqueBucketLists.forEach(function(bucket){
+    uniqueBucketLists.forEach(function (bucket) {
         tags.push(bucket);
     });
 
@@ -559,21 +566,21 @@ function _createHashTags(details) {
     details.hashSamples.forEach(function (sample) {
         // push source(s)
         if (Array.isArray(sample.source)) {
-            sample.source.forEach(function(source){
-               uniqueSources.add(source.name + _createSourceMarker());
+            sample.source.forEach(function (source) {
+                uniqueSources.add(source.name + _createSourceMarker());
             });
         }
 
         // push campaign name(s)
         if (Array.isArray(sample.campaign)) {
-            sample.campaign.forEach(function(campaign){
-               uniqueCampaigns.add(campaign.name + _createCampaignMarker());
+            sample.campaign.forEach(function (campaign) {
+                uniqueCampaigns.add(campaign.name + _createCampaignMarker());
             });
         }
 
         // push bucket_list (array of tags)
         if (Array.isArray(sample.bucket_list)) {
-            sample.bucket_list.forEach(function(bucket){
+            sample.bucket_list.forEach(function (bucket) {
                 uniqueBucketLists.add(bucket);
             });
         }
@@ -582,35 +589,35 @@ function _createHashTags(details) {
     details.hashIndicators.forEach(function (indicator) {
         // push source(s)
         if (Array.isArray(indicator.source)) {
-            indicator.source.forEach(function(source){
+            indicator.source.forEach(function (source) {
                 uniqueSources.add(source.name + _createSourceMarker());
             });
         }
 
         // push campaign name(s)
         if (Array.isArray(indicator.campaign)) {
-            indicator.campaign.forEach(function(campaign){
+            indicator.campaign.forEach(function (campaign) {
                 uniqueCampaigns.add(campaign.name + _createCampaignMarker());
             });
         }
 
         // push bucket_list (array of tags)
         if (Array.isArray(indicator.bucket_list)) {
-            indicator.bucket_list.forEach(function(bucket){
+            indicator.bucket_list.forEach(function (bucket) {
                 uniqueBucketLists.add(bucket);
             });
         }
     });
 
-    uniqueSources.forEach(function(source){
+    uniqueSources.forEach(function (source) {
         tags.push(source);
     });
 
-    uniqueCampaigns.forEach(function(campaign){
+    uniqueCampaigns.forEach(function (campaign) {
         tags.push(campaign);
     });
 
-    uniqueBucketLists.forEach(function(bucket){
+    uniqueBucketLists.forEach(function (bucket) {
         tags.push(bucket);
     });
 
@@ -647,34 +654,34 @@ function _createTags(object) {
 function validateOptions(userOptions, cb) {
     let errors = [];
 
-    if(typeof userOptions.apiKey.value !== 'string' ||
-        (typeof userOptions.apiKey.value === 'string' && userOptions.apiKey.value.length === 0)){
+    if (typeof userOptions.apiKey.value !== 'string' ||
+        (typeof userOptions.apiKey.value === 'string' && userOptions.apiKey.value.length === 0)) {
         errors.push({
             key: 'apiKey',
             message: 'You must provide a CRITs API key'
         })
     }
 
-    if(typeof userOptions.hostname.value !== 'string' ||
-        (typeof userOptions.hostname.value === 'string' && userOptions.hostname.value.length === 0)){
+    if (typeof userOptions.hostname.value !== 'string' ||
+        (typeof userOptions.hostname.value === 'string' && userOptions.hostname.value.length === 0)) {
         errors.push({
             key: 'hostname',
             message: 'You must provide a hostname'
         })
     }
 
-    if(typeof userOptions.username.value !== 'string' ||
-        (typeof userOptions.username.value === 'string' && userOptions.username.value.length === 0)){
+    if (typeof userOptions.username.value !== 'string' ||
+        (typeof userOptions.username.value === 'string' && userOptions.username.value.length === 0)) {
         errors.push({
             key: 'username',
             message: 'You must provide a username'
         })
     }
 
-    if(typeof userOptions.domainBlackList.value === 'string' && userOptions.domainBlackList.value.length > 0){
-        try{
+    if (typeof userOptions.domainBlackList.value === 'string' && userOptions.domainBlackList.value.length > 0) {
+        try {
             new RegExp(userOptions.domainBlackList.value);
-        }catch(e){
+        } catch (e) {
             errors.push({
                 key: 'domainBlackList',
                 message: 'The regular expression you provided is not valid'

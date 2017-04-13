@@ -22,7 +22,7 @@ module.exports = {
      * @type String[]
      * @required
      */
-    entityTypes: ["IPv4", "domain", "hash"],
+    entityTypes: ["IPv4", "IPv6", "domain", "hash"],
     /**
      * Description for this integration which is displayed in the Polarity integrations user interface
      *
@@ -59,7 +59,7 @@ module.exports = {
     /**
      * The level of logging for this integration. Valid values are 'info', 'debug', 'trace', 'warning', 'error'
      */
-    logging: {level: "debug"},
+    logging: {level: "info"},
     /**
      * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
      * as an array of option objects.

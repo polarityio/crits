@@ -18,7 +18,7 @@ Domains are currently searched as their own resource (not as an indicator) by qu
 
 ### IP Addresses
 
-The Polarity CRITs integration currently searches for IPv4 and IPv6 (including RFC 1918 addresses) entities as a resource by querying the URL `/api/v1/ips`.  
+The Polarity CRITs integration currently searches for IPv4 and IPv6 (including RFC 1918 addresses) entities as a resource and indicator type by querying the URL `/api/v1/ips` and `/api/v1/indicators?c-type=ip&c-lower=<ipValue>`.  
 
 ### Hashes
 
