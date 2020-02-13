@@ -2,11 +2,11 @@
   "main": "./integration.js",
   "name": "polarity-crits",
   "description": "Integration with CRITs",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "dependencies": {
-    "request": "2.84.0",
-    "lodash": "4.17.5",
-    "async": "2.1.2"
+    "request": "^2.88.2",
+    "lodash": "^4.17.15",
+    "async": "^3.1.1"
   }
 }
