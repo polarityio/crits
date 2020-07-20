@@ -143,9 +143,9 @@ module.exports = {
             adminOnly: false
         },
         {
-            key: "domainBlackList",
-            name: "Domain Black List Regex",
-            description: "Domains that match the given regex will not be looked up (if blank no domains will be black listed)",
+            key: "domainBlockList",
+            name: "Ignored Domain Regex",
+            description: "Domains that match the given regex will not be looked up.",
             default: "",
             type: "text",
             userCanEdit: true,
