@@ -148,7 +148,7 @@ module.exports = {
             description: "Domains that match the given regex will not be looked up.",
             default: "",
             type: "text",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         },
         {
@@ -157,7 +157,7 @@ module.exports = {
             description: "If checked, the integration will lookup IP addresses",
             default: true,
             type: "boolean",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         },
         {
@@ -166,7 +166,7 @@ module.exports = {
             description: "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
             default: true,
             type: "boolean",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         },
         {
@@ -175,7 +175,7 @@ module.exports = {
             description: "If checked, the integration will lookup domains",
             default: true,
             type: "boolean",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         }
     ]
