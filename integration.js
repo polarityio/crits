@@ -57,10 +57,10 @@ function startup(logger) {
  @param cb callback function
  */
 function doLookup(entities, options, cb) {
-    let domainBlackListRegex;
+    let domainBlockListRegex;
 
-    if (typeof options.domainBlackList === 'string' && options.domainBlackList.length > 0) {
-        domainBlackListRegex = new RegExp(options.domainBlackList, 'i');
+    if (typeof options.domainBlockList === 'string' && options.domainBlockList.length > 0) {
+        domainBlockListRegex = new RegExp(options.domainBlockList, 'i');
     }
 
     let lookupResults = [];
@@ -100,9 +100,9 @@ function doLookup(entities, options, cb) {
                 }
             });
         } else if (entityObj.isDomain && options.lookupDomains) {
-            if (typeof domainBlackListRegex !== 'undefined') {
-                if (domainBlackListRegex.test(entityObj.value)) {
-                    Logger.debug({domain: entityObj.value}, 'Blocked BlackListed Domain Lookup');
+            if (typeof domainBlockListRegex !== 'undefined') {
+                if (domainBlockListRegex.test(entityObj.value)) {
+                    Logger.debug({domain: entityObj.value}, 'Blocked BlockListed Domain Lookup');
                     next(null);
                     return;
                 }
@@ -678,12 +678,12 @@ function validateOptions(userOptions, cb) {
         })
     }
 
-    if (typeof userOptions.domainBlackList.value === 'string' && userOptions.domainBlackList.value.length > 0) {
+    if (typeof userOptions.domainBlockList.value === 'string' && userOptions.domainBlockList.value.length > 0) {
         try {
-            new RegExp(userOptions.domainBlackList.value);
+            new RegExp(userOptions.domainBlockList.value);
         } catch (e) {
             errors.push({
-                key: 'domainBlackList',
+                key: 'domainBlockList',
                 message: 'The regular expression you provided is not valid'
             })
         }
