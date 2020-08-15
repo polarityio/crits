@@ -56,10 +56,28 @@ module.exports = {
             file: "./templates/polarity-crits.hbs"
         }
     },
-    /**
-     * The level of logging for this integration. Valid values are 'info', 'debug', 'trace', 'warning', 'error'
-     */
-    logging: {level: "info"},
+    request: {
+        // Provide the path to your certFile. Leave an empty string to ignore this option.
+        // Relative paths are relative to the CRA integration's root directory
+        cert: "",
+        // Provide the path to your private key. Leave an empty string to ignore this option.
+        // Relative paths are relative to the CRA integration's root directory
+        key: "",
+        // Provide the key passphrase if required.  Leave an empty string to ignore this option.
+        // Relative paths are relative to the CRA integration's root directory
+        passphrase: "",
+        // Provide the Certificate Authority. Leave an empty string to ignore this option.
+        // Relative paths are relative to the CRA integration's root directory
+        ca: "",
+        // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
+        // the url parameter (by embedding the auth info in the uri)
+        proxy: "",
+
+        rejectUnauthorized: true
+    },
+    logging: {
+        level: "info" //trace, debug, info, warn, error, fatal
+    },
     /**
      * Options that are displayed to the user/admin in the Polarity integration user-interface.  Should be structured
      * as an array of option objects.
