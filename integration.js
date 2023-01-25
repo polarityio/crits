@@ -1,7 +1,7 @@
 'use strict';
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-let request = require('request');
+let request = require('postman-request');
 let _ = require('lodash');
 let async = require('async');
 let Logger;

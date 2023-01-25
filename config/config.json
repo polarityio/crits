@@ -1,0 +1,92 @@
+{
+  "name": "CRITs",
+  "acronym": "CRIT",
+  "defaultColor": "light-blue",
+  "entityTypes": ["IPv4", "IPv6", "domain", "hash"],
+  "description": "Integration for CRITs, an open source malware and threat repository",
+  "styles": ["./styles/polarity-crits.less"],
+  "block": {
+    "component": {
+      "file": "./components/polarity-crits.js"
+    },
+    "template": {
+      "file": "./templates/polarity-crits.hbs"
+    }
+  },
+  "request": {
+    "cert": "",
+    "key": "",
+    "passphrase": "",
+    "ca": "",
+    "proxy": "",
+    "rejectUnauthorized": true
+  },
+  "logging": {
+    "level": "info"
+  },
+  "options": [
+    {
+      "key": "hostname",
+      "name": "CRITs Hostname",
+      "description": "The hostname for your CRITs server including \"http://\" or \"https://\" as required.",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": true
+    },
+    {
+      "key": "apiKey",
+      "name": "API Key",
+      "description": "Your API key for authenticating to CRITs",
+      "default": "",
+      "type": "text",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "username",
+      "name": "Username",
+      "description": "Your CRITs username",
+      "default": "",
+      "type": "text",
+      "userCanEdit": true,
+      "adminOnly": false
+    },
+    {
+      "key": "domainBlockList",
+      "name": "Ignored Domain Regex",
+      "description": "Domains that match the given regex will not be looked up.",
+      "default": "",
+      "type": "text",
+      "userCanEdit": false,
+      "adminOnly": false
+    },
+    {
+      "key": "lookupIps",
+      "name": "Lookup IP Address Resources",
+      "description": "If checked, the integration will lookup IP addresses",
+      "default": true,
+      "type": "boolean",
+      "userCanEdit": false,
+      "adminOnly": false
+    },
+    {
+      "key": "lookupHashes",
+      "name": "Lookup Hashes",
+      "description": "If checked, the integration will lookup MD5, SHA1 and SHA256 indicators",
+      "default": true,
+      "type": "boolean",
+      "userCanEdit": false,
+      "adminOnly": false
+    },
+    {
+      "key": "lookupDomains",
+      "name": "Lookup Domains",
+      "description": "If checked, the integration will lookup domains",
+      "default": true,
+      "type": "boolean",
+      "userCanEdit": false,
+      "adminOnly": false
+    }
+  ]
+}
