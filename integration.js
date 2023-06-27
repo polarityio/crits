@@ -223,8 +223,7 @@ function _lookupHash(entityObj, options, cb) {
             request({
                 uri: _getHashUri(entityObj.hashType, entityObj.value, options),
                 method: 'GET',
-                json: true,
-                rejectUnauthorized: false
+                json: true
             }, function (err, response, body) {
                 _processHashResults(err, response, body, parallelCb);
             });
@@ -233,8 +232,7 @@ function _lookupHash(entityObj, options, cb) {
             request({
                 uri: _getHashSampleUri(entityObj.hashType, entityObj.value, options),
                 method: 'GET',
-                json: true,
-                rejectUnauthorized: false
+                json: true
             }, function (err, response, body) {
                 _processHashResults(err, response, body, parallelCb);
             });
@@ -333,8 +331,7 @@ function _lookupIPs(entityObj, options, cb) {
             request({
                 uri: _getIndicatorIPUri(entityObj.value, entityObj.type, options),
                 method: 'GET',
-                json: true,
-                rejectUnauthorized: false
+                json: true
             }, function (err, response, body) {
                 _processMultipleResults(err, response, body, parallelCb);
             });
@@ -344,8 +341,7 @@ function _lookupIPs(entityObj, options, cb) {
             request({
                 uri: _getIpUri(entityObj.value, options),
                 method: 'GET',
-                json: true,
-                rejectUnauthorized: false
+                json: true
             }, function (err, response, body) {
                 _processMultipleResults(err, response, body, parallelCb);
             });
@@ -486,8 +482,7 @@ function _lookupDomains(entityObj, options, cb) {
     request({
         uri: _getCritsDomainUri(entityObj.value, options),
         method: 'GET',
-        json: true,
-        rejectUnauthorized: false
+        json: true
     }, function (err, response, body) {
         // check for an error
         let error = _getErrorMessage(err, response, body);
