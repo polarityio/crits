@@ -1,12 +1,12 @@
 {
   "name": "polarity-crits",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "main": "./integration.js",
   "description": "Integration with CRITs",
   "private": true,
   "dependencies": {
     "async": "^3.2.0",
     "lodash": "^4.17.19",
-    "postman-request": "^2.88.1-postman.32"
+    "postman-request": "^2.88.1-postman.33"
   }
 }
