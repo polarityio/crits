@@ -3,9 +3,18 @@
   "name": "CRITs",
   "acronym": "CRIT",
   "defaultColor": "light-blue",
-  "entityTypes": ["IPv4", "IPv6", "domain", "MD5", "SHA1", "SHA256"],
+  "entityTypes": [
+    "IPv4",
+    "IPv6",
+    "domain",
+    "MD5",
+    "SHA1",
+    "SHA256"
+  ],
   "description": "Integration for CRITs, an open source malware and threat repository",
-  "styles": ["./styles/polarity-crits.less"],
+  "styles": [
+    "./styles/polarity-crits.less"
+  ],
   "block": {
     "component": {
       "file": "./components/polarity-crits.js"
@@ -81,5 +90,10 @@
       "userCanEdit": false,
       "adminOnly": false
     }
-  ]
+  ],
+  "reducer": {
+    "details": {
+      "file": "./reducers/details.json"
+    }
+  }
 }

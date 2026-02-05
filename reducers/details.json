@@ -1,0 +1,46 @@
+{
+  "root": {
+    "path": "",
+    "on_null": "return_empty"
+  },
+  "pipeline": [
+    {
+      "op": "copy",
+      "from": "hashSamples",
+      "to": "reduced_results.hashSamples"
+    },
+    {
+      "op": "copy",
+      "from": "type",
+      "to": "reduced_results.type"
+    },
+    {
+      "op": "copy",
+      "from": "bucketList",
+      "to": "reduced_results.bucketList"
+    },
+    {
+      "op": "copy",
+      "from": "hashIndicators[].bucketList",
+      "to": "reduced_results.hashIndicators_bucketList"
+    },
+    {
+      "op": "copy",
+      "from": "IPIndicator[].bucketList",
+      "to": "reduced_results.IPIndicator_bucketList"
+    },
+    {
+      "op": "copy",
+      "from": "IPObject[].bucketList",
+      "to": "reduced_results.IPObject_bucketList"
+    },
+    {
+      "op": "prune",
+      "strategy": "empty_values",
+      "target": "reduced_results"
+    }
+  ],
+  "output": {
+    "result": "$working.reduced_results"
+  }
+}

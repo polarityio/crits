@@ -1,0 +1,83 @@
+{
+  "type": "hash",
+  "hashSamples": [
+    {
+      "filename": "malware.exe",
+      "filenames": ["malware.exe", "trojan.bin"],
+      "critsLookupUrl": "https://crits.example.com/samples/details/d41d8cd98f00b204e9800998ecf8427e/",
+      "bucketList": ["APT28", "Exploit", "Ransomware"],
+      "campaign": [
+        {
+          "name": "Operation Aurora",
+          "analyst": "john.doe",
+          "confidence": "high",
+          "date": "2024-01-15T10:30:00Z"
+        }
+      ],
+      "description": "Known ransomware sample associated with APT28 campaign",
+      "modified": "2024-01-16T08:00:00Z",
+      "source": [
+        {
+          "name": "VirusTotal",
+          "instances": 1
+        },
+        {
+          "name": "Internal Sandbox",
+          "instances": 1
+        }
+      ],
+      "patchDescriptionUri": "/api/v1/samples/507f1f77bcf86cd799439011?username=admin&api_key=abc123"
+    },
+    {
+      "filename": "backdoor.dll",
+      "filenames": ["backdoor.dll"],
+      "critsLookupUrl": "https://crits.example.com/samples/details/098f6bcd4621d373cade4e832627b4f6/",
+      "bucketList": ["C2", "Backdoor"],
+      "campaign": [],
+      "description": "Command and control backdoor component",
+      "modified": "2024-01-10T14:22:00Z",
+      "source": [
+        {
+          "name": "MISP",
+          "instances": 2
+        }
+      ],
+      "patchDescriptionUri": "/api/v1/samples/507f1f77bcf86cd799439012?username=admin&api_key=abc123"
+    }
+  ],
+  "hashIndicators": [
+    {
+      "critsLookupUrl": "https://crits.example.com/indicators/details/507f191e810c19729de860ea/",
+      "bucketList": ["Malware", "APT28", "Phishing"],
+      "campaign": [
+        {
+          "name": "Operation Aurora",
+          "analyst": "jane.smith",
+          "confidence": "medium",
+          "date": "2024-01-14T16:45:00Z"
+        }
+      ],
+      "description": "MD5 hash indicator for known APT28 malware family",
+      "modified": "2024-01-15T12:30:00Z",
+      "source": [
+        {
+          "name": "AlienVault OTX",
+          "instances": 3
+        }
+      ],
+      "threatTypes": ["Targeted Attack", "Malware", "Data Exfiltration"],
+      "patchDescriptionUri": "/api/v1/indicators/507f191e810c19729de860ea?username=admin&api_key=abc123"
+    }
+  ],
+  "critsLookupUrl": "https://crits.example.com/indicators/details/507f191e810c19729de860ea/",
+  "summary": [
+    "2 <i class=\"fa fa-bug integration-text-bold-color\"></i>",
+    "VirusTotal <i class=\"bts bt-fw bt-map-marker integration-text-bold-color\"></i>",
+    "Operation Aurora <i class=\"fa fa-fw fa-bullhorn integration-text-bold-color\"></i>",
+    "APT28",
+    "Exploit"
+  ],
+  "internalDebugId": "crits-12345-67890",
+  "queryTimestamp": "2024-01-16T08:11:00Z",
+  "apiResponseCode": 200
+}
